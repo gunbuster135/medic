@@ -1,0 +1,12 @@
+{
+  "services": [
+    {
+      "id": "api-service",
+      "url": "localhost:8080"
+    },
+    {
+      "id": "storage-service",
+      "url": "localhost:8090"
+    }
+  ]
+}
