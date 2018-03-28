@@ -1,19 +1,20 @@
 package io.einharjar.medic
 
+import io.einharjar.medic.config.ConfigurationLoader
 import io.einharjar.medic.healthcheck.ServiceRepository
 import io.einharjar.medic.task.HealthCheckTask
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Vertx
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.Router
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 class MedicVerticle : AbstractVerticle() {
     private val logger = LoggerFactory.getLogger(this.javaClass.name)
     override fun start() {
-        val serviceRepository = ServiceRepository(ConcurrentHashMap())
+        val config = ConfigurationLoader().loadConfig()
 
+        val serviceRepository = ServiceRepository(config.services)
 
         val vertx = Vertx.vertx()
         setupTasks(vertx, serviceRepository)
@@ -21,8 +22,8 @@ class MedicVerticle : AbstractVerticle() {
         val router = Router.router(vertx)
         setupRouting(router)
 
-        vertx.createHttpServer().requestHandler(router::accept).listen(9000) {
-            if (it.succeeded()) logger.info("Server listening at 9000")
+        vertx.createHttpServer().requestHandler(router::accept).listen(config.serverConfig.port) {
+            if (it.succeeded()) logger.info("Server listening at ${config.serverConfig.port}")
             else println(it.cause())
         }
     }
